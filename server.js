@@ -30,15 +30,17 @@ app.use((req,res,next)=>{
 app.get('/api/tamu/:tamu_id',async(req,res)=>{
     try{
         const gTamu = await TamuModel.findById(req.params.tamu_id)
-        const filePath = path.join(BASE_DIR_UPLOADS , gTamu.tamu_identity , gTamu.tamu_date , gTamu.tamu_filename)
-        const faceIdGTamu = fs.existsSync(path.join(BASE_DIR_UPLOADS , gTamu.tamu_identity , req.params.date_in , gTamu.tamu_filename))
+        const filePath = path.join(gTamu.tamu_identity , gTamu.tamu_date , gTamu.tamu_filename)
+        const faceIdGTamu = fs.existsSync(path.join(BASE_DIR_UPLOADS , gTamu.tamu_identity , gTamu.tamu_date , gTamu.tamu_filename))
         if(!faceIdGTamu){
             throw new Error('FILE_NOT_FOUND')
         }
         res.json({
             code:200,
             data:{
-                ...gTamu,
+                ...gTamu.get({
+                    plain:true
+                }),
                 face_id:`/u/${filePath}`                
             }
         })
